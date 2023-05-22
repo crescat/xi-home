@@ -13,28 +13,18 @@ from homeassistant.helpers import update_coordinator
 from homeassistant.helpers.reload import async_integration_yaml_config
 from homeassistant.helpers import device_registry as dr
 
-from .const import DOMAIN, COMMAND_URL, STATUS_URL, DATA_URL
+from .const import DOMAIN, COMMAND_URL, STATUS_URL, DATA_URL, PUBLIC_URL
 
 
 _LOGGER = logging.getLogger(__name__)
 
 # TODO List the platforms that you want to support.
 # For your initial PR, limit it to 1 platform.
-PLATFORMS: list[Platform] = [Platform.LIGHT, Platform.CLIMATE, Platform.SENSOR, Platform.FAN]
+PLATFORMS: list[Platform] = [Platform.LIGHT, Platform.CLIMATE, Platform.SENSOR, Platform.FAN, Platform.SWITCH, Platform.BUTTON]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up xi_home from a config entry."""
-
-    _conf = await async_integration_yaml_config(hass, DOMAIN)
-    if not _conf or DOMAIN not in _conf:
-        _LOGGER.warning(
-            "No `xi_home:` key found in configuration.yaml"
-        )
-    else:
-        config = _conf[DOMAIN]
-
-
-    coordinator = MyCoordinator(hass, config["token"], config["username"])
+    coordinator = MyCoordinator(hass, entry.data["token"], entry.data["username"], entry.data["session_id"])
     await coordinator.async_config_entry_first_refresh()
     hass.data[DOMAIN] = coordinator
 
@@ -55,7 +45,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 class MyCoordinator(update_coordinator.DataUpdateCoordinator):
     """My custom coordinator."""
 
-    def __init__(self, hass, token, user_id):
+    def __init__(self, hass, token, user_id, session_id=None):
         """Initialize my coordinator."""
         super().__init__(
             hass,
@@ -67,7 +57,8 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
         )
         self.token = token
         self.user_id = user_id
-        self.session_id = "xxxxxxxx"
+        self.session_id = session_id
+        self.lobby_door_data = None
 
     async def _async_update_data(self):
         """Fetch data from API endpoint.
@@ -89,6 +80,9 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
         """Get the latest data from xi_home."""
         if self.session_id is None:
             self.session_id = self.get_xi_home_session_id()
+
+        if self.lobby_door_data is None:
+            self.lobby_door_data = self.get_lobby_door_data()
 
         body = {"sessionid": self.session_id,
                 "userid": self.user_id}
@@ -151,6 +145,14 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
         }
         response = requests.post(STATUS_URL, data=json.dumps(body), headers=self.get_header(), timeout=5)
         return response.json()["status"]
+
+    def get_lobby_door_data(self):
+        body = {
+            "type":"doorlock",
+            "userid":self.user_id
+        }
+        response = requests.post(PUBLIC_URL, data=json.dumps(body), headers=self.get_header(), timeout=5)
+        return response.json()["data"]["list"]
 
     def get_xi_home_session_id(self):
         """Get session id from xi_home."""

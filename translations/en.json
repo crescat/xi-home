@@ -11,8 +11,8 @@
         "step": {
             "user": {
                 "data": {
-                    "host": "Host",
-                    "password": "Password",
+                    "token": "Token",
+                    "session_id": "Session ID",
                     "username": "Username"
                 }
             }
