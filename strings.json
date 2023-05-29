@@ -5,7 +5,6 @@
         "data": {
           "token": "[%key:common::config_flow::data::token%]",
           "username": "[%key:common::config_flow::data::username%]",
-          "session_id": "[%key:common::config_flow::data::session_id%]"
         }
       }
     },

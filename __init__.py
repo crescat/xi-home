@@ -24,7 +24,7 @@ PLATFORMS: list[Platform] = [Platform.LIGHT, Platform.CLIMATE, Platform.SENSOR, 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up xi_home from a config entry."""
-    coordinator = MyCoordinator(hass, entry.data["token"], entry.data["username"], entry.data["session_id"])
+    coordinator = MyCoordinator(hass, entry.data["token"], entry.data["username"])
     await coordinator.async_config_entry_first_refresh()
     hass.data[DOMAIN] = coordinator
 

@@ -12,7 +12,6 @@
             "user": {
                 "data": {
                     "token": "Token",
-                    "session_id": "Session ID",
                     "username": "Username"
                 }
             }

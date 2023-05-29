@@ -10,6 +10,8 @@ from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
+import requests
+import json
 
 from .const import DOMAIN
 
@@ -20,25 +22,8 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Required("token"): str,
         vol.Required("username"): str,
-        vol.Required("session_id"): str,
     }
 )
-
-
-class PlaceholderHub:
-    """Placeholder class to make tests pass.
-
-    TODO Remove this placeholder class and replace with things from your PyPI package.
-    """
-
-    def __init__(self, host: str) -> None:
-        """Initialize."""
-        self.host = host
-
-    async def authenticate(self, username: str, password: str) -> bool:
-        """Test if we can authenticate with the host."""
-        return True
-
 
 async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str, Any]:
     """Validate the user input allows us to connect.
@@ -53,9 +38,7 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     #     your_validate_func, data["username"], data["password"]
     # )
 
-    hub = PlaceholderHub(data["session_id"])
-
-    if not await hub.authenticate(data["username"], data["token"]):
+    if not await hass.async_add_executor_job(validate_token, data["username"], data["token"]):
         raise InvalidAuth
 
     # If you cannot connect:
@@ -66,6 +49,17 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     # Return info that you want to store in the config entry.
     return {"title": "Name of the device"}
 
+def validate_token(user_id, token):
+    url = "https://smartcareback.twinspace.co.kr:20001/auth/user"
+    headers = {
+        "authorization": "Bearer {}".format(token),
+        "content-type": "application/json",
+    }
+    body = {"userid": user_id}
+    print(headers, body)
+    response = requests.post(url, data=json.dumps(body), headers=headers, timeout=5)
+    print(response.text)
+    return response.json()['result'] == 0
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for xi_home."""
