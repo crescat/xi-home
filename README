@@ -1,0 +1,12 @@
+An integration for smart devices in Xi Apartments.
+
+
+Supported devices:
+
+- Light
+- Heating unit
+- Fresh air unit
+- Entrance gate lock
+- Elevator call
+
+You have to sniff the traffic from the Xi Space app to get the token.
