@@ -13,7 +13,7 @@ from homeassistant.exceptions import HomeAssistantError
 import requests
 import json
 
-from .const import DOMAIN
+from .const import DOMAIN, TIMEOUT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -57,7 +57,7 @@ def validate_token(user_id, token):
     }
     body = {"userid": user_id}
     print(headers, body)
-    response = requests.post(url, data=json.dumps(body), headers=headers, timeout=5)
+    response = requests.post(url, data=json.dumps(body), headers=headers, timeout=TIMEOUT)
     print(response.text)
     return response.json()['result'] == 0
 

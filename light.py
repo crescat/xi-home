@@ -20,7 +20,7 @@ import requests
 import json
 
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from .const import DOMAIN, COMMAND_URL
+from .const import DOMAIN, COMMAND_URL, TIMEOUT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -116,7 +116,7 @@ class XiHomeLight(CoordinatorEntity, LightEntity):
         if self._type == "dimming":
             body["status"]["dimming"] = str(self._brightness)
 
-        response = requests.post(COMMAND_URL, data=json.dumps(body), headers=header(self.coordinator.token), timeout=5)
+        response = requests.post(COMMAND_URL, data=json.dumps(body), headers=header(self.coordinator.token), timeout=TIMEOUT)
         self._state = True
         self.schedule_update_ha_state()
 
@@ -132,7 +132,7 @@ class XiHomeLight(CoordinatorEntity, LightEntity):
         if self._type == "dimming":
             body["status"]["dimming"] = "0"
 
-        response = requests.post(COMMAND_URL, data=json.dumps(body), headers=header(self.coordinator.token), timeout=5)
+        response = requests.post(COMMAND_URL, data=json.dumps(body), headers=header(self.coordinator.token), timeout=TIMEOUT)
         self._state = False
         self.schedule_update_ha_state()
 

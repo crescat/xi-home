@@ -16,7 +16,7 @@ import requests
 import json
 
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from .const import DOMAIN, COMMAND_URL
+from .const import DOMAIN, COMMAND_URL, TIMEOUT
 
 # erv
 VENTILATION_OFF = "Ventilation Off"
@@ -184,7 +184,7 @@ class XiHomeVentilationSystem(CoordinatorEntity, FanEntity):
             "userid": self.coordinator.user_id
             }
 
-        response = requests.post(COMMAND_URL, data=json.dumps(body), headers=header(self.coordinator.token), timeout=5)
+        response = requests.post(COMMAND_URL, data=json.dumps(body), headers=header(self.coordinator.token), timeout=TIMEOUT)
         self.update_coordinator_data()
         self.schedule_update_ha_state()
 
@@ -349,7 +349,7 @@ class XiHomeFreshAirUnit(CoordinatorEntity, FanEntity):
             "userid": self.coordinator.user_id
             }
 
-        response = requests.post(COMMAND_URL, data=json.dumps(body), headers=header(self.coordinator.token), timeout=5)
+        response = requests.post(COMMAND_URL, data=json.dumps(body), headers=header(self.coordinator.token), timeout=TIMEOUT)
         self.update_coordinator_data()
         self.schedule_update_ha_state()
 

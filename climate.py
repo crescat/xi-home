@@ -200,7 +200,7 @@ class XiHomeHeatingSystem(CoordinatorEntity, ClimateEntity):
             "userid": self.coordinator.user_id,
         }
 
-        response = requests.post(COMMAND_URL, data=json.dumps(body), headers=header(self.coordinator.token), timeout=5)
+        response = requests.post(COMMAND_URL, data=json.dumps(body), headers=header(self.coordinator.token), timeout=TIMEOUT)
         self._current_hvac_mode = HVACMode.HEAT
         self.schedule_update_ha_state()
 
@@ -220,7 +220,7 @@ class XiHomeHeatingSystem(CoordinatorEntity, ClimateEntity):
             "userid": self.coordinator.user_id,
         }
 
-        response = requests.post(COMMAND_URL, data=json.dumps(body), headers=header(self.coordinator.token), timeout=5)
+        response = requests.post(COMMAND_URL, data=json.dumps(body), headers=header(self.coordinator.token), timeout=TIMEOUT)
         self._current_hvac_mode = HVACMode.OFF
         self.schedule_update_ha_state()
 

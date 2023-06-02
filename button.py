@@ -14,7 +14,7 @@ from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 import requests
 import json
 
-from .const import DOMAIN, PUBLIC_URL
+from .const import DOMAIN, PUBLIC_URL, TIMEOUT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -83,7 +83,7 @@ class XiHomeElevatorButton(ButtonEntity):
             "type": "elevator",
             "userid":self.coordinator.user_id,
             }
-        response = requests.post(PUBLIC_URL, data=json.dumps(body), headers=header(self.coordinator.token), timeout=5)
+        response = requests.post(PUBLIC_URL, data=json.dumps(body), headers=header(self.coordinator.token), timeout=TIMEOUT)
 
 
 class XiHomeDoorButton(ButtonEntity):
@@ -126,4 +126,4 @@ class XiHomeDoorButton(ButtonEntity):
             "door": "{}&{}".format(self._lobbydong, self._lobbyho),
             "userid":self.coordinator.user_id,
             }
-        response = requests.post(url, data=json.dumps(body), headers=header(self.coordinator.token), timeout=5)
+        response = requests.post(url, data=json.dumps(body), headers=header(self.coordinator.token), timeout=TIMEOUT)

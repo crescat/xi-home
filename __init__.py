@@ -13,7 +13,7 @@ from homeassistant.helpers import update_coordinator
 from homeassistant.helpers.reload import async_integration_yaml_config
 from homeassistant.helpers import device_registry as dr
 
-from .const import DOMAIN, COMMAND_URL, STATUS_URL, DATA_URL, PUBLIC_URL
+from .const import DOMAIN, COMMAND_URL, STATUS_URL, DATA_URL, PUBLIC_URL, TIMEOUT
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -87,7 +87,7 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
         body = {"sessionid": self.session_id,
                 "userid": self.user_id}
 
-        response = requests.post(DATA_URL, data=json.dumps(body), headers=self.get_header(), timeout=5)
+        response = requests.post(DATA_URL, data=json.dumps(body), headers=self.get_header(), timeout=TIMEOUT)
         data = response.json()
         indexed = dict()
         for device in data["devices"]:
@@ -134,7 +134,7 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
             },
             "userid": self.user_id
         }
-        response = requests.post(COMMAND_URL, data=json.dumps(body), headers=self.get_header(), timeout=5)
+        response = requests.post(COMMAND_URL, data=json.dumps(body), headers=self.get_header(), timeout=TIMEOUT)
 
     def get_acs_data(self, device_id, group_id):
         body = {
@@ -143,7 +143,7 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
             "groupId": group_id,
             "userid": self.user_id
         }
-        response = requests.post(STATUS_URL, data=json.dumps(body), headers=self.get_header(), timeout=5)
+        response = requests.post(STATUS_URL, data=json.dumps(body), headers=self.get_header(), timeout=TIMEOUT)
         return response.json()["status"]
 
     def get_lobby_door_data(self):
@@ -151,7 +151,7 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
             "type":"doorlock",
             "userid":self.user_id
         }
-        response = requests.post(PUBLIC_URL, data=json.dumps(body), headers=self.get_header(), timeout=5)
+        response = requests.post(PUBLIC_URL, data=json.dumps(body), headers=self.get_header(), timeout=TIMEOUT)
         return response.json()["data"]["list"]
 
     def get_xi_home_session_id(self):
@@ -162,7 +162,7 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
             "content-type": "application/json",
         }
         body = {"userid": self.user_id}
-        response = requests.post(url, data=json.dumps(body), headers=headers, timeout=1.5)
+        response = requests.post(url, data=json.dumps(body), headers=headers, timeout=TIMEOUT)
         return response.json()['sessionid']
 
     def get_header(self):
