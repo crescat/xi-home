@@ -4,7 +4,7 @@
       "user": {
         "data": {
           "token": "[%key:common::config_flow::data::token%]",
-          "username": "[%key:common::config_flow::data::username%]",
+          "username": "[%key:common::config_flow::data::username%]"
         }
       }
     },
