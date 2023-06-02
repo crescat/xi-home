@@ -92,7 +92,7 @@ class XiHomeVentilationSystem(CoordinatorEntity, FanEntity):
     @property
     def is_on(self) -> bool | None:
         """Return true if fan is on."""
-        return self._state
+        return bool(self._state)
 
     @property
     def unique_id(self) -> str:
@@ -262,7 +262,7 @@ class XiHomeFreshAirUnit(CoordinatorEntity, FanEntity):
     @property
     def is_on(self) -> bool | None:
         """Return true if fan is on."""
-        return self._state
+        return bool(self._state)
 
     @property
     def unique_id(self) -> str:

@@ -61,7 +61,7 @@ class XiHomeLight(CoordinatorEntity, LightEntity):
         self._state = device_data["status"]["power"]
         self._group = device_data["group"]
         self._type = device_data["type"]
-        self._brightness = None
+        self._brightness = -1
         # brightness range: 1-4 when on, 0 when off
         if self._type == "dimming":
             self._attr_supported_color_modes = {ColorMode.BRIGHTNESS}

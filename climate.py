@@ -163,8 +163,9 @@ class XiHomeHeatingSystem(CoordinatorEntity, ClimateEntity):
 
     def set_temperature(self, **kwargs: Any):
         """Set new target temperature."""
-        if kwargs.get(ATTR_TEMPERATURE) is not None:
-            self._target_temperature = int(kwargs.get(ATTR_TEMPERATURE))
+        temp = kwargs.get(ATTR_TEMPERATURE)
+        if temp is not None:
+            self._target_temperature = int(temp)
             if self.is_on:
                 self.turn_on()
 
