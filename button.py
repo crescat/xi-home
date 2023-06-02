@@ -29,9 +29,7 @@ async def async_setup_entry(
     for door in coordinator.lobby_door_data:
         entities.append(XiHomeDoorButton(door, coordinator))
 
-    async_add_entities(
-        entities
-    )
+    async_add_entities(entities)
 
 
 class XiHomeElevatorButton(ButtonEntity):
@@ -62,17 +60,15 @@ class XiHomeElevatorButton(ButtonEntity):
     def device_info(self) -> DeviceInfo:
         """Return the device info."""
         return DeviceInfo(
-            identifiers={
-                (DOMAIN, self._group)
-            },
+            identifiers={(DOMAIN, self._group)},
         )
 
     def press(self) -> None:
         """Handle the button press."""
         body = {
             "type": "elevator",
-            "userid":self.coordinator.user_id,
-            }
+            "userid": self.coordinator.user_id,
+        }
         _response = request_data("/public", self.coordinator.token, body)
 
 
@@ -104,15 +100,13 @@ class XiHomeDoorButton(ButtonEntity):
     def device_info(self) -> DeviceInfo:
         """Return the device info."""
         return DeviceInfo(
-            identifiers={
-                (DOMAIN, self._group)
-            },
+            identifiers={(DOMAIN, self._group)},
         )
 
     def press(self) -> None:
         """Handle the button press."""
         body = {
             "door": "{}&{}".format(self._lobbydong, self._lobbyho),
-            "userid":self.coordinator.user_id,
-            }
+            "userid": self.coordinator.user_id,
+        }
         _response = request_data("/public/openlobby", self.coordinator.token, body)

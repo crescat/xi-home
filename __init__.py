@@ -15,7 +15,15 @@ from .helper import request_data
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS: list[Platform] = [Platform.LIGHT, Platform.CLIMATE, Platform.SENSOR, Platform.FAN, Platform.SWITCH, Platform.BUTTON]
+PLATFORMS: list[Platform] = [
+    Platform.LIGHT,
+    Platform.CLIMATE,
+    Platform.SENSOR,
+    Platform.FAN,
+    Platform.SWITCH,
+    Platform.BUTTON,
+]
+
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up xi_home from a config entry."""
@@ -36,6 +44,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     return True
+
 
 class MyCoordinator(update_coordinator.DataUpdateCoordinator):
     """My custom coordinator."""
@@ -70,8 +79,6 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
             data = await self.hass.async_add_executor_job(self.get_xi_home_api_data)
             return data
 
-
-
     def get_xi_home_api_data(self):
         """Get the latest data from xi_home."""
         if self.session_id is None:
@@ -80,8 +87,7 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
         if self.lobby_door_data is None:
             self.lobby_door_data = self.get_lobby_door_data()
 
-        body = {"sessionid": self.session_id,
-                "userid": self.user_id}
+        body = {"sessionid": self.session_id, "userid": self.user_id}
 
         data = request_data("/device/list-redis", self.token, body)
         indexed = dict()
@@ -95,7 +101,9 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
                     device["status"]["dust_unit"] = acs_data["dust_unit"]
 
                 if device["status"]["dust_unit"] != "PM2.5":
-                    self.acs_change_unit(device["device_id"], device["groupID"], "PM2.5")
+                    self.acs_change_unit(
+                        device["device_id"], device["groupID"], "PM2.5"
+                    )
                     acs_data = self.get_acs_data(device["device_id"], device["groupID"])
                     device["status"]["dust_value"] = acs_data["dust_value"]
                     device["status"]["dust_unit"] = acs_data["dust_unit"]
@@ -125,9 +133,9 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
                 "fau_mode": "",
                 "erv_mode": "",
                 "fau_air_volume": 0,
-                "erv_air_volume": 0
+                "erv_air_volume": 0,
             },
-            "userid": self.user_id
+            "userid": self.user_id,
         }
         _response = request_data("/device/command", self.token, body)
 
@@ -136,16 +144,13 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
             "device_id": device_id,
             "type": "acs",
             "groupId": group_id,
-            "userid": self.user_id
+            "userid": self.user_id,
         }
         response = request_data("/device/status", self.token, body)
         return response["status"]
 
     def get_lobby_door_data(self):
-        body = {
-            "type":"doorlock",
-            "userid":self.user_id
-        }
+        body = {"type": "doorlock", "userid": self.user_id}
         response = request_data("/public", self.token, body)
         return response["data"]["list"]
 
@@ -153,7 +158,7 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
         """Get session id from xi_home."""
         body = {"userid": self.user_id}
         response = request_data("/auth/user", self.token, body)
-        return response['sessionid']
+        return response["sessionid"]
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

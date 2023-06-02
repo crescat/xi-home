@@ -11,7 +11,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from homeassistant.const import (ATTR_TEMPERATURE, UnitOfTemperature, PRECISION_WHOLE)
+from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature, PRECISION_WHOLE
 
 from .const import DOMAIN
 from .helper import request_data
@@ -46,10 +46,11 @@ COMMAND_VALUES = {
     VENTILATION_MEDIUM: [1, 2, "manual"],
     VENTILATION_HIGH: [1, 3, "manual"],
     VENTILATION_AUTO: [1, 0, "auto"],
-    VENTILATION_SLEEP: [1, 0, "sleep"]
-    }
+    VENTILATION_SLEEP: [1, 0, "sleep"],
+}
 
 _LOGGER = logging.getLogger(__name__)
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -63,9 +64,8 @@ async def async_setup_entry(
         if device["type"] == "heating-system":
             entities.append(XiHomeHeatingSystem(device, coordinator))
 
-    async_add_entities(
-        entities
-    )
+    async_add_entities(entities)
+
 
 class XiHomeHeatingSystem(CoordinatorEntity, ClimateEntity):
     """Representation of an Xihome Heating System."""
@@ -82,12 +82,14 @@ class XiHomeHeatingSystem(CoordinatorEntity, ClimateEntity):
         self._name = "{} Heating System".format(device_data["group"])
         self._device_id = device_data["device_id"]
         self._current_temperature = int(device_data["status"]["curtemp"])
-        self._target_temperature = int(device_data["status"]["settemp"]) # minimum 5
+        self._target_temperature = int(device_data["status"]["settemp"])  # minimum 5
 
         self._temperature_unit = UnitOfTemperature.CELSIUS
         self._precision = PRECISION_WHOLE
         self._hvac_modes = [HVACMode.OFF, HVACMode.HEAT]
-        self._current_hvac_mode = HVACMode.HEAT if device_data["status"]["power"] else HVACMode.OFF
+        self._current_hvac_mode = (
+            HVACMode.HEAT if device_data["status"]["power"] else HVACMode.OFF
+        )
         self._supported_features = ClimateEntityFeature.TARGET_TEMPERATURE
         self._min_temp = 5
         self._max_temp = 40
@@ -156,9 +158,7 @@ class XiHomeHeatingSystem(CoordinatorEntity, ClimateEntity):
     def device_info(self) -> DeviceInfo:
         """Return the device info."""
         return DeviceInfo(
-            identifiers={
-                (DOMAIN, self._group)
-            },
+            identifiers={(DOMAIN, self._group)},
         )
 
     def set_temperature(self, **kwargs: Any):
@@ -187,13 +187,12 @@ class XiHomeHeatingSystem(CoordinatorEntity, ClimateEntity):
                 "mode": 1,
                 "curtemp": self._current_temperature,
                 "settemp": self._target_temperature,
-                },
+            },
             "userid": self.coordinator.user_id,
         }
         _response = request_data("/device/command", self.coordinator.token, body)
         self._current_hvac_mode = HVACMode.HEAT
         self.schedule_update_ha_state()
-
 
     def turn_off(self, **kwargs: Any) -> None:
         """Instruct the heating system to turn on."""
@@ -206,7 +205,7 @@ class XiHomeHeatingSystem(CoordinatorEntity, ClimateEntity):
                 "mode": 0,
                 "curtemp": self._current_temperature,
                 "settemp": 5,
-                },
+            },
             "userid": self.coordinator.user_id,
         }
         _response = request_data("/device/command", self.coordinator.token, body)
@@ -218,9 +217,9 @@ class XiHomeHeatingSystem(CoordinatorEntity, ClimateEntity):
         """Handle updated data from the coordinator."""
         data = self.coordinator.data["indexed_devices"][self.idx]
         self._current_temperature = int(data["status"]["curtemp"])
-        self._current_hvac_mode = HVACMode.HEAT if data["status"]["mode"] else HVACMode.OFF
+        self._current_hvac_mode = (
+            HVACMode.HEAT if data["status"]["mode"] else HVACMode.OFF
+        )
         if self._current_hvac_mode == HVACMode.HEAT:
             self._target_temperature = int(data["status"]["settemp"])
         self.async_write_ha_state()
-
-

@@ -16,6 +16,7 @@ from .helper import request_data
 
 _LOGGER = logging.getLogger(__name__)
 
+
 async def async_setup_entry(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
@@ -28,9 +29,7 @@ async def async_setup_entry(
         if device["type"] == "lightall":
             entities.append(XiHomeAllLightSwtich(device, coordinator))
 
-    async_add_entities(
-        entities
-    )
+    async_add_entities(entities)
 
 
 class XiHomeAllLightSwtich(CoordinatorEntity, SwitchEntity):
@@ -68,9 +67,7 @@ class XiHomeAllLightSwtich(CoordinatorEntity, SwitchEntity):
     def device_info(self) -> DeviceInfo:
         """Return the device info."""
         return DeviceInfo(
-            identifiers={
-                (DOMAIN, self._group)
-            },
+            identifiers={(DOMAIN, self._group)},
         )
 
     def turn_on(self, **kwargs: Any) -> None:
@@ -103,5 +100,7 @@ class XiHomeAllLightSwtich(CoordinatorEntity, SwitchEntity):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        self._state = self.coordinator.data["indexed_devices"][self.idx]["status"]["power"]
+        self._state = self.coordinator.data["indexed_devices"][self.idx]["status"][
+            "power"
+        ]
         self.async_write_ha_state()

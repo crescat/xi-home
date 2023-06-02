@@ -23,13 +23,16 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
     }
 )
 
+
 async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str, Any]:
     """Validate the user input allows us to connect.
 
     Data has the keys from STEP_USER_DATA_SCHEMA with values provided by the user.
     """
 
-    if not await hass.async_add_executor_job(validate_token, data["username"], data["token"]):
+    if not await hass.async_add_executor_job(
+        validate_token, data["username"], data["token"]
+    ):
         raise InvalidAuth
 
     # If you cannot connect:
@@ -40,10 +43,12 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     # Return info that you want to store in the config entry.
     return {"title": "Name of the device"}
 
+
 def validate_token(user_id, token):
     body = {"userid": user_id}
     response = request_data("/auth/user", token, body)
-    return response['result'] == 0
+    return response["result"] == 0
+
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for xi_home."""

@@ -33,9 +33,7 @@ async def async_setup_entry(
             entities.append(XiHomePM25Sensor(device, coordinator))
             entities.append(XiHomeCO2Sensor(device, coordinator))
 
-    async_add_entities(
-        entities
-    )
+    async_add_entities(entities)
 
 
 class XiHomePM25Sensor(CoordinatorEntity, SensorEntity):
@@ -69,15 +67,15 @@ class XiHomePM25Sensor(CoordinatorEntity, SensorEntity):
     def device_info(self) -> DeviceInfo:
         """Return the device info."""
         return DeviceInfo(
-            identifiers={
-                (DOMAIN, self._group)
-            },
+            identifiers={(DOMAIN, self._group)},
         )
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        self._attr_native_value = int(self.coordinator.data["indexed_devices"][self.idx]["status"]["dust_value"])
+        self._attr_native_value = int(
+            self.coordinator.data["indexed_devices"][self.idx]["status"]["dust_value"]
+        )
         self.async_write_ha_state()
 
 
@@ -112,13 +110,13 @@ class XiHomeCO2Sensor(CoordinatorEntity, SensorEntity):
     def device_info(self) -> DeviceInfo:
         """Return the device info."""
         return DeviceInfo(
-            identifiers={
-                (DOMAIN, self._group)
-            },
+            identifiers={(DOMAIN, self._group)},
         )
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        self._attr_native_value = int(self.coordinator.data["indexed_devices"][self.idx]["status"]["co2_value"])
+        self._attr_native_value = int(
+            self.coordinator.data["indexed_devices"][self.idx]["status"]["co2_value"]
+        )
         self.async_write_ha_state()

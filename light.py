@@ -24,9 +24,10 @@ _LOGGER = logging.getLogger(__name__)
 
 def header(token: str) -> dict[str, str]:
     return {
-            "authorization": "Bearer {}".format(token),
-            "content-type": "application/json",
-        }
+        "authorization": "Bearer {}".format(token),
+        "content-type": "application/json",
+    }
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -40,9 +41,7 @@ async def async_setup_entry(
         if device["type"] == "light" or device["type"] == "dimming":
             entities.append(XiHomeLight(device, coordinator))
 
-    async_add_entities(
-        entities
-    )
+    async_add_entities(entities)
 
 
 class XiHomeLight(CoordinatorEntity, LightEntity):
@@ -54,7 +53,9 @@ class XiHomeLight(CoordinatorEntity, LightEntity):
         super().__init__(coordinator, context=self.idx)
 
         self.entity_id = "light." + device_data["device_id"]
-        self._name = "{} Light {}".format(device_data["group"], device_data["name"].split(".")[0])
+        self._name = "{} Light {}".format(
+            device_data["group"], device_data["name"].split(".")[0]
+        )
         self._device_id = device_data["device_id"]
         self._group_id = device_data["groupID"]
         self._state = device_data["status"]["power"]
@@ -87,9 +88,7 @@ class XiHomeLight(CoordinatorEntity, LightEntity):
     def device_info(self) -> DeviceInfo:
         """Return the device info."""
         return DeviceInfo(
-            identifiers={
-                (DOMAIN, self._group)
-            },
+            identifiers={(DOMAIN, self._group)},
         )
 
     @property
@@ -136,5 +135,7 @@ class XiHomeLight(CoordinatorEntity, LightEntity):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        self._state = self.coordinator.data["indexed_devices"][self.idx]["status"]["power"]
+        self._state = self.coordinator.data["indexed_devices"][self.idx]["status"][
+            "power"
+        ]
         self.async_write_ha_state()

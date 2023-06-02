@@ -31,14 +31,16 @@ COMMAND_VALUES = {
     AIR_PURIFY_BOOST: [1, 4, "manual"],
     VENTILATION_OFF: [0, 0, ""],
     VENTILATION_AUTO: [1, 0, "auto"],
-    VENTILATION_SLEEP: [1, 0, "sleep"]
-    }
+    VENTILATION_SLEEP: [1, 0, "sleep"],
+}
+
 
 def header(token: str) -> dict[str, str]:
     return {
-            "authorization": "Bearer {}".format(token),
-            "content-type": "application/json",
-        }
+        "authorization": "Bearer {}".format(token),
+        "content-type": "application/json",
+    }
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -53,9 +55,8 @@ async def async_setup_entry(
             entities.append(XiHomeVentilationSystem(device, coordinator))
             entities.append(XiHomeFreshAirUnit(device, coordinator))
 
-    async_add_entities(
-        entities
-    )
+    async_add_entities(entities)
+
 
 class XiHomeVentilationSystem(CoordinatorEntity, FanEntity):
     """Representation of an Xihome Ventilation System."""
@@ -77,7 +78,9 @@ class XiHomeVentilationSystem(CoordinatorEntity, FanEntity):
         self._speed_count = 3
         self._mode = ""
 
-        self._supported_features = FanEntityFeature.PRESET_MODE | FanEntityFeature.SET_SPEED
+        self._supported_features = (
+            FanEntityFeature.PRESET_MODE | FanEntityFeature.SET_SPEED
+        )
         self._preset_modes = ["auto", "sleep"]
         self.set_state_from_status_data(device_data["status"])
 
@@ -127,9 +130,7 @@ class XiHomeVentilationSystem(CoordinatorEntity, FanEntity):
     def device_info(self) -> DeviceInfo:
         """Return the device info."""
         return DeviceInfo(
-            identifiers={
-                (DOMAIN, self._group)
-            },
+            identifiers={(DOMAIN, self._group)},
         )
 
     def set_state_from_status_data(self, status):
@@ -174,20 +175,31 @@ class XiHomeVentilationSystem(CoordinatorEntity, FanEntity):
                 "fau_air_volume": int(data["fau_airvolume"]),
                 "erv_air_volume": self._current_speed,
                 "fau_reserve_time": 0,
-                "erv_reserve_time": 0
+                "erv_reserve_time": 0,
             },
-            "userid": self.coordinator.user_id
-            }
+            "userid": self.coordinator.user_id,
+        }
         _response = request_data("/device/command", self.coordinator.token, body)
         self.update_coordinator_data()
         self.schedule_update_ha_state()
 
     def update_coordinator_data(self):
-        self.coordinator.data["indexed_devices"][self.idx]["status"]["erv_runstate"] = self._state
-        self.coordinator.data["indexed_devices"][self.idx]["status"]["erv_mode"] = self._mode
-        self.coordinator.data["indexed_devices"][self.idx]["status"]["erv_airvolume"] = self._current_speed
+        self.coordinator.data["indexed_devices"][self.idx]["status"][
+            "erv_runstate"
+        ] = self._state
+        self.coordinator.data["indexed_devices"][self.idx]["status"][
+            "erv_mode"
+        ] = self._mode
+        self.coordinator.data["indexed_devices"][self.idx]["status"][
+            "erv_airvolume"
+        ] = self._current_speed
 
-    def turn_on(self, percentage: Optional[int] = None, preset_mode: Optional[str] = None, **kwargs: Any) -> None:
+    def turn_on(
+        self,
+        percentage: Optional[int] = None,
+        preset_mode: Optional[str] = None,
+        **kwargs: Any,
+    ) -> None:
         """Turn on the fan."""
         if preset_mode is not None:
             self.set_preset_mode(preset_mode)
@@ -215,6 +227,7 @@ class XiHomeVentilationSystem(CoordinatorEntity, FanEntity):
         self.set_state_from_status_data(data)
         self.async_write_ha_state()
 
+
 class XiHomeFreshAirUnit(CoordinatorEntity, FanEntity):
     """Representation of an XiHome Fresh Air Unit."""
 
@@ -235,7 +248,9 @@ class XiHomeFreshAirUnit(CoordinatorEntity, FanEntity):
         self._speed_count = 3
         self._mode = ""
 
-        self._supported_features = FanEntityFeature.PRESET_MODE | FanEntityFeature.SET_SPEED
+        self._supported_features = (
+            FanEntityFeature.PRESET_MODE | FanEntityFeature.SET_SPEED
+        )
         self._preset_modes = ["auto", "sleep", "boost"]
         self.set_state_from_status_data(device_data["status"])
 
@@ -287,9 +302,7 @@ class XiHomeFreshAirUnit(CoordinatorEntity, FanEntity):
     def device_info(self) -> DeviceInfo:
         """Return the device info."""
         return DeviceInfo(
-            identifiers={
-                (DOMAIN, self._group)
-            },
+            identifiers={(DOMAIN, self._group)},
         )
 
     def set_state_from_status_data(self, status):
@@ -338,21 +351,32 @@ class XiHomeFreshAirUnit(CoordinatorEntity, FanEntity):
                 "fau_air_volume": self._current_speed,
                 "erv_air_volume": int(data["erv_airvolume"]),
                 "fau_reserve_time": 0,
-                "erv_reserve_time": 0
+                "erv_reserve_time": 0,
             },
-            "userid": self.coordinator.user_id
-            }
+            "userid": self.coordinator.user_id,
+        }
 
         _response = request_data("/device/command", self.coordinator.token, body)
         self.update_coordinator_data()
         self.schedule_update_ha_state()
 
     def update_coordinator_data(self):
-        self.coordinator.data["indexed_devices"][self.idx]["status"]["fau_runstate"] = self._state
-        self.coordinator.data["indexed_devices"][self.idx]["status"]["fau_mode"] = self._mode
-        self.coordinator.data["indexed_devices"][self.idx]["status"]["fau_airvolume"] = self._current_speed
+        self.coordinator.data["indexed_devices"][self.idx]["status"][
+            "fau_runstate"
+        ] = self._state
+        self.coordinator.data["indexed_devices"][self.idx]["status"][
+            "fau_mode"
+        ] = self._mode
+        self.coordinator.data["indexed_devices"][self.idx]["status"][
+            "fau_airvolume"
+        ] = self._current_speed
 
-    def turn_on(self, percentage: Optional[int] = None, preset_mode: Optional[str] = None, **kwargs: Any) -> None:
+    def turn_on(
+        self,
+        percentage: Optional[int] = None,
+        preset_mode: Optional[str] = None,
+        **kwargs: Any,
+    ) -> None:
         """Turn on the fan."""
         if preset_mode is not None:
             self.set_preset_mode(preset_mode)
@@ -378,4 +402,3 @@ class XiHomeFreshAirUnit(CoordinatorEntity, FanEntity):
         data = self.coordinator.data["indexed_devices"][self.idx]["status"]
         self.set_state_from_status_data(data)
         self.async_write_ha_state()
-
