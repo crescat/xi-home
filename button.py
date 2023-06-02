@@ -2,28 +2,18 @@
 from __future__ import annotations
 
 import logging
-import async_timeout
 
 from homeassistant.components.button import ButtonEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
-import requests
-import json
-
-from .const import DOMAIN, PUBLIC_URL, TIMEOUT
+from .const import DOMAIN, PUBLIC_URL
+from .helper import request_data
 
 _LOGGER = logging.getLogger(__name__)
 
-
-def header(token: str) -> dict[str, str]:
-    return {
-            "authorization": "Bearer {}".format(token),
-            "content-type": "application/json",
-        }
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -83,7 +73,7 @@ class XiHomeElevatorButton(ButtonEntity):
             "type": "elevator",
             "userid":self.coordinator.user_id,
             }
-        response = requests.post(PUBLIC_URL, data=json.dumps(body), headers=header(self.coordinator.token), timeout=TIMEOUT)
+        _response = request_data(PUBLIC_URL, self.coordinator.token, body)
 
 
 class XiHomeDoorButton(ButtonEntity):
@@ -121,9 +111,8 @@ class XiHomeDoorButton(ButtonEntity):
 
     def press(self) -> None:
         """Handle the button press."""
-        url = PUBLIC_URL + "/openlobby"
         body = {
             "door": "{}&{}".format(self._lobbydong, self._lobbyho),
             "userid":self.coordinator.user_id,
             }
-        response = requests.post(url, data=json.dumps(body), headers=header(self.coordinator.token), timeout=TIMEOUT)
+        _response = request_data(PUBLIC_URL + "/openlobby", self.coordinator.token, body)

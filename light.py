@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import logging
-import async_timeout
+from typing import Any
 
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
@@ -14,13 +14,10 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
-
-import requests
-import json
-
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from .const import DOMAIN, COMMAND_URL, TIMEOUT
+
+from .const import DOMAIN, COMMAND_URL
+from .helper import request_data
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -116,7 +113,7 @@ class XiHomeLight(CoordinatorEntity, LightEntity):
         if self._type == "dimming":
             body["status"]["dimming"] = str(self._brightness)
 
-        response = requests.post(COMMAND_URL, data=json.dumps(body), headers=header(self.coordinator.token), timeout=TIMEOUT)
+        _response = request_data(COMMAND_URL, self.coordinator.token, body)
         self._state = True
         self.schedule_update_ha_state()
 
@@ -132,7 +129,7 @@ class XiHomeLight(CoordinatorEntity, LightEntity):
         if self._type == "dimming":
             body["status"]["dimming"] = "0"
 
-        response = requests.post(COMMAND_URL, data=json.dumps(body), headers=header(self.coordinator.token), timeout=TIMEOUT)
+        _response = request_data(COMMAND_URL, self.coordinator.token, body)
         self._state = False
         self.schedule_update_ha_state()
 

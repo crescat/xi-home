@@ -1,22 +1,17 @@
 """Platform for fan integration."""
 from __future__ import annotations
 
-import logging
-from typing import Optional
+from typing import Any, Optional
 from homeassistant.components.fan import FanEntityFeature, FanEntity
 
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
-
-
-import requests
-import json
-
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from .const import DOMAIN, COMMAND_URL, TIMEOUT
+
+from .const import DOMAIN, COMMAND_URL
+from .helper import request_data
 
 # erv
 VENTILATION_OFF = "Ventilation Off"
@@ -183,8 +178,7 @@ class XiHomeVentilationSystem(CoordinatorEntity, FanEntity):
             },
             "userid": self.coordinator.user_id
             }
-
-        response = requests.post(COMMAND_URL, data=json.dumps(body), headers=header(self.coordinator.token), timeout=TIMEOUT)
+        _response = request_data(COMMAND_URL, self.coordinator.token, body)
         self.update_coordinator_data()
         self.schedule_update_ha_state()
 
@@ -349,7 +343,7 @@ class XiHomeFreshAirUnit(CoordinatorEntity, FanEntity):
             "userid": self.coordinator.user_id
             }
 
-        response = requests.post(COMMAND_URL, data=json.dumps(body), headers=header(self.coordinator.token), timeout=TIMEOUT)
+        _response = request_data(COMMAND_URL, self.coordinator.token, body)
         self.update_coordinator_data()
         self.schedule_update_ha_state()
 

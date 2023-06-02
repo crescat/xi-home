@@ -2,24 +2,19 @@
 from __future__ import annotations
 from datetime import timedelta
 import logging
-import requests
-import json
 import async_timeout
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import update_coordinator
-from homeassistant.helpers.reload import async_integration_yaml_config
 from homeassistant.helpers import device_registry as dr
 
-from .const import DOMAIN, COMMAND_URL, STATUS_URL, DATA_URL, PUBLIC_URL, TIMEOUT
-
+from .const import DOMAIN, COMMAND_URL, STATUS_URL, DATA_URL, PUBLIC_URL, AUTH_URL
+from .helper import request_data
 
 _LOGGER = logging.getLogger(__name__)
 
-# TODO List the platforms that you want to support.
-# For your initial PR, limit it to 1 platform.
 PLATFORMS: list[Platform] = [Platform.LIGHT, Platform.CLIMATE, Platform.SENSOR, Platform.FAN, Platform.SWITCH, Platform.BUTTON]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -45,7 +40,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 class MyCoordinator(update_coordinator.DataUpdateCoordinator):
     """My custom coordinator."""
 
-    def __init__(self, hass, token, user_id, session_id=None):
+    def __init__(self, hass: HomeAssistant, token, user_id, session_id=None) -> None:
         """Initialize my coordinator."""
         super().__init__(
             hass,
@@ -76,6 +71,7 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
             return data
 
 
+
     def get_xi_home_api_data(self):
         """Get the latest data from xi_home."""
         if self.session_id is None:
@@ -87,8 +83,7 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
         body = {"sessionid": self.session_id,
                 "userid": self.user_id}
 
-        response = requests.post(DATA_URL, data=json.dumps(body), headers=self.get_header(), timeout=TIMEOUT)
-        data = response.json()
+        data = request_data(DATA_URL, self.token, body)
         indexed = dict()
         for device in data["devices"]:
             if device["type"] == "acs":
@@ -134,7 +129,7 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
             },
             "userid": self.user_id
         }
-        response = requests.post(COMMAND_URL, data=json.dumps(body), headers=self.get_header(), timeout=TIMEOUT)
+        _response = request_data(COMMAND_URL, self.token, body)
 
     def get_acs_data(self, device_id, group_id):
         body = {
@@ -143,33 +138,23 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
             "groupId": group_id,
             "userid": self.user_id
         }
-        response = requests.post(STATUS_URL, data=json.dumps(body), headers=self.get_header(), timeout=TIMEOUT)
-        return response.json()["status"]
+        response = request_data(STATUS_URL, self.token, body)
+        return response["status"]
 
     def get_lobby_door_data(self):
         body = {
             "type":"doorlock",
             "userid":self.user_id
         }
-        response = requests.post(PUBLIC_URL, data=json.dumps(body), headers=self.get_header(), timeout=TIMEOUT)
-        return response.json()["data"]["list"]
+        response = request_data(PUBLIC_URL, self.token, body)
+        return response["data"]["list"]
 
     def get_xi_home_session_id(self):
         """Get session id from xi_home."""
-        url = "https://smartcareback.twinspace.co.kr:20001/auth/user"
-        headers = {
-            "authorization": "Bearer {}".format(self.token),
-            "content-type": "application/json",
-        }
         body = {"userid": self.user_id}
-        response = requests.post(url, data=json.dumps(body), headers=headers, timeout=TIMEOUT)
-        return response.json()['sessionid']
+        response = request_data(AUTH_URL, self.token, body)
+        return response['sessionid']
 
-    def get_header(self):
-        return {
-            "authorization": "Bearer {}".format(self.token),
-            "content-type": "application/json",
-        }
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""

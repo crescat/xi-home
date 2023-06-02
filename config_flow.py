@@ -10,14 +10,12 @@ from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
-import requests
-import json
 
-from .const import DOMAIN, TIMEOUT
+from .const import DOMAIN, AUTH_URL
+from .helper import request_data
 
 _LOGGER = logging.getLogger(__name__)
 
-# TODO adjust the data schema to the data that you need
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Required("token"): str,
@@ -30,13 +28,6 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
 
     Data has the keys from STEP_USER_DATA_SCHEMA with values provided by the user.
     """
-    # TODO validate the data can be used to set up a connection.
-
-    # If your PyPI package is not built with async, pass your methods
-    # to the executor:
-    # await hass.async_add_executor_job(
-    #     your_validate_func, data["username"], data["password"]
-    # )
 
     if not await hass.async_add_executor_job(validate_token, data["username"], data["token"]):
         raise InvalidAuth
@@ -50,16 +41,9 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     return {"title": "Name of the device"}
 
 def validate_token(user_id, token):
-    url = "https://smartcareback.twinspace.co.kr:20001/auth/user"
-    headers = {
-        "authorization": "Bearer {}".format(token),
-        "content-type": "application/json",
-    }
     body = {"userid": user_id}
-    print(headers, body)
-    response = requests.post(url, data=json.dumps(body), headers=headers, timeout=TIMEOUT)
-    print(response.text)
-    return response.json()['result'] == 0
+    response = request_data(AUTH_URL, token, body)
+    return response['result'] == 0
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for xi_home."""

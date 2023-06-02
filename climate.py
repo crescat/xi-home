@@ -2,22 +2,19 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 from homeassistant.components.climate import ClimateEntity
-from homeassistant.components.climate.const import SUPPORT_FAN_MODE, SUPPORT_PRESET_MODE, HVACMode, SUPPORT_TARGET_TEMPERATURE
+from homeassistant.components.climate import HVACMode, ClimateEntityFeature
 
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
-
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.const import (ATTR_TEMPERATURE, UnitOfTemperature, PRECISION_WHOLE)
 
-import requests
-import json
-
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN, COMMAND_URL
+from .helper import request_data
 
 # erv
 VENTILATION_OFF = "Ventilation Off"
@@ -53,12 +50,6 @@ COMMAND_VALUES = {
     }
 
 _LOGGER = logging.getLogger(__name__)
-
-def header(token: str) -> dict[str, str]:
-    return {
-            "authorization": "Bearer {}".format(token),
-            "content-type": "application/json",
-        }
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -97,7 +88,7 @@ class XiHomeHeatingSystem(CoordinatorEntity, ClimateEntity):
         self._precision = PRECISION_WHOLE
         self._hvac_modes = [HVACMode.OFF, HVACMode.HEAT]
         self._current_hvac_mode = HVACMode.HEAT if device_data["status"]["power"] else HVACMode.OFF
-        self._supported_features = SUPPORT_TARGET_TEMPERATURE
+        self._supported_features = ClimateEntityFeature.TARGET_TEMPERATURE
         self._min_temp = 5
         self._max_temp = 40
 
@@ -199,8 +190,7 @@ class XiHomeHeatingSystem(CoordinatorEntity, ClimateEntity):
                 },
             "userid": self.coordinator.user_id,
         }
-
-        response = requests.post(COMMAND_URL, data=json.dumps(body), headers=header(self.coordinator.token), timeout=TIMEOUT)
+        _response = request_data(COMMAND_URL, self.coordinator.token, body)
         self._current_hvac_mode = HVACMode.HEAT
         self.schedule_update_ha_state()
 
@@ -219,8 +209,7 @@ class XiHomeHeatingSystem(CoordinatorEntity, ClimateEntity):
                 },
             "userid": self.coordinator.user_id,
         }
-
-        response = requests.post(COMMAND_URL, data=json.dumps(body), headers=header(self.coordinator.token), timeout=TIMEOUT)
+        _response = request_data(COMMAND_URL, self.coordinator.token, body)
         self._current_hvac_mode = HVACMode.OFF
         self.schedule_update_ha_state()
 
