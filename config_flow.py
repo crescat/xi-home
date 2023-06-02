@@ -11,7 +11,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
 
-from .const import DOMAIN, AUTH_URL
+from .const import DOMAIN
 from .helper import request_data
 
 _LOGGER = logging.getLogger(__name__)
@@ -42,7 +42,7 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
 
 def validate_token(user_id, token):
     body = {"userid": user_id}
-    response = request_data(AUTH_URL, token, body)
+    response = request_data("/auth/user", token, body)
     return response['result'] == 0
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):

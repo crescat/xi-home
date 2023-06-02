@@ -13,7 +13,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.const import (ATTR_TEMPERATURE, UnitOfTemperature, PRECISION_WHOLE)
 
-from .const import DOMAIN, COMMAND_URL
+from .const import DOMAIN
 from .helper import request_data
 
 # erv
@@ -190,7 +190,7 @@ class XiHomeHeatingSystem(CoordinatorEntity, ClimateEntity):
                 },
             "userid": self.coordinator.user_id,
         }
-        _response = request_data(COMMAND_URL, self.coordinator.token, body)
+        _response = request_data("/device/command", self.coordinator.token, body)
         self._current_hvac_mode = HVACMode.HEAT
         self.schedule_update_ha_state()
 
@@ -209,7 +209,7 @@ class XiHomeHeatingSystem(CoordinatorEntity, ClimateEntity):
                 },
             "userid": self.coordinator.user_id,
         }
-        _response = request_data(COMMAND_URL, self.coordinator.token, body)
+        _response = request_data("/device/command", self.coordinator.token, body)
         self._current_hvac_mode = HVACMode.OFF
         self.schedule_update_ha_state()
 

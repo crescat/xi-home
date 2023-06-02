@@ -11,7 +11,7 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, COMMAND_URL
+from .const import DOMAIN
 from .helper import request_data
 
 _LOGGER = logging.getLogger(__name__)
@@ -82,7 +82,7 @@ class XiHomeAllLightSwtich(CoordinatorEntity, SwitchEntity):
             "status": {"power": True},
             "userid": self.coordinator.user_id,
         }
-        _response = request_data(COMMAND_URL, self.coordinator.token, body)
+        _response = request_data("/device/command", self.coordinator.token, body)
         self._state = True
         self.schedule_update_ha_state()
 
@@ -96,7 +96,7 @@ class XiHomeAllLightSwtich(CoordinatorEntity, SwitchEntity):
             "userid": self.coordinator.user_id,
         }
 
-        _response = request_data(COMMAND_URL, self.coordinator.token, body)
+        _response = request_data("/device/command", self.coordinator.token, body)
         self._state = False
         self.schedule_update_ha_state()
 

@@ -10,7 +10,7 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, COMMAND_URL
+from .const import DOMAIN
 from .helper import request_data
 
 # erv
@@ -178,7 +178,7 @@ class XiHomeVentilationSystem(CoordinatorEntity, FanEntity):
             },
             "userid": self.coordinator.user_id
             }
-        _response = request_data(COMMAND_URL, self.coordinator.token, body)
+        _response = request_data("/device/command", self.coordinator.token, body)
         self.update_coordinator_data()
         self.schedule_update_ha_state()
 
@@ -343,7 +343,7 @@ class XiHomeFreshAirUnit(CoordinatorEntity, FanEntity):
             "userid": self.coordinator.user_id
             }
 
-        _response = request_data(COMMAND_URL, self.coordinator.token, body)
+        _response = request_data("/device/command", self.coordinator.token, body)
         self.update_coordinator_data()
         self.schedule_update_ha_state()
 

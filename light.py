@@ -16,7 +16,7 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, COMMAND_URL
+from .const import DOMAIN
 from .helper import request_data
 
 _LOGGER = logging.getLogger(__name__)
@@ -113,7 +113,7 @@ class XiHomeLight(CoordinatorEntity, LightEntity):
         if self._type == "dimming":
             body["status"]["dimming"] = str(self._brightness)
 
-        _response = request_data(COMMAND_URL, self.coordinator.token, body)
+        _response = request_data("/device/command", self.coordinator.token, body)
         self._state = True
         self.schedule_update_ha_state()
 
@@ -129,7 +129,7 @@ class XiHomeLight(CoordinatorEntity, LightEntity):
         if self._type == "dimming":
             body["status"]["dimming"] = "0"
 
-        _response = request_data(COMMAND_URL, self.coordinator.token, body)
+        _response = request_data("/device/command", self.coordinator.token, body)
         self._state = False
         self.schedule_update_ha_state()
 

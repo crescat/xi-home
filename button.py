@@ -9,7 +9,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import DOMAIN, PUBLIC_URL
+from .const import DOMAIN
 from .helper import request_data
 
 _LOGGER = logging.getLogger(__name__)
@@ -73,7 +73,7 @@ class XiHomeElevatorButton(ButtonEntity):
             "type": "elevator",
             "userid":self.coordinator.user_id,
             }
-        _response = request_data(PUBLIC_URL, self.coordinator.token, body)
+        _response = request_data("/public", self.coordinator.token, body)
 
 
 class XiHomeDoorButton(ButtonEntity):
@@ -115,4 +115,4 @@ class XiHomeDoorButton(ButtonEntity):
             "door": "{}&{}".format(self._lobbydong, self._lobbyho),
             "userid":self.coordinator.user_id,
             }
-        _response = request_data(PUBLIC_URL + "/openlobby", self.coordinator.token, body)
+        _response = request_data("/public/openlobby", self.coordinator.token, body)

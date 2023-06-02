@@ -10,7 +10,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import update_coordinator
 from homeassistant.helpers import device_registry as dr
 
-from .const import DOMAIN, COMMAND_URL, STATUS_URL, DATA_URL, PUBLIC_URL, AUTH_URL
+from .const import DOMAIN
 from .helper import request_data
 
 _LOGGER = logging.getLogger(__name__)
@@ -83,7 +83,7 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
         body = {"sessionid": self.session_id,
                 "userid": self.user_id}
 
-        data = request_data(DATA_URL, self.token, body)
+        data = request_data("/device/list-redis", self.token, body)
         indexed = dict()
         for device in data["devices"]:
             if device["type"] == "acs":
@@ -129,7 +129,7 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
             },
             "userid": self.user_id
         }
-        _response = request_data(COMMAND_URL, self.token, body)
+        _response = request_data("/device/command", self.token, body)
 
     def get_acs_data(self, device_id, group_id):
         body = {
@@ -138,7 +138,7 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
             "groupId": group_id,
             "userid": self.user_id
         }
-        response = request_data(STATUS_URL, self.token, body)
+        response = request_data("/device/status", self.token, body)
         return response["status"]
 
     def get_lobby_door_data(self):
@@ -146,13 +146,13 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
             "type":"doorlock",
             "userid":self.user_id
         }
-        response = request_data(PUBLIC_URL, self.token, body)
+        response = request_data("/public", self.token, body)
         return response["data"]["list"]
 
     def get_xi_home_session_id(self):
         """Get session id from xi_home."""
         body = {"userid": self.user_id}
-        response = request_data(AUTH_URL, self.token, body)
+        response = request_data("/auth/user", self.token, body)
         return response['sessionid']
 
 
