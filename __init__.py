@@ -93,12 +93,12 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
         indexed = dict()
         for device in data["devices"]:
             if device["type"] == "acs":
-                if device["status"]["dust_unit"] == "":
-                    acs_data = self.get_acs_data(device["device_id"], device["groupID"])
-                    device["status"]["dust_value"] = acs_data["dust_value"]
-                    device["status"]["co2_value"] = acs_data["co2_value"]
-                    device["status"]["smell_value"] = acs_data["smell_value"]
-                    device["status"]["dust_unit"] = acs_data["dust_unit"]
+                # acs data from list-redis api is not correct
+                acs_data = self.get_acs_data(device["device_id"], device["groupID"])
+                device["status"]["dust_value"] = acs_data["dust_value"]
+                device["status"]["co2_value"] = acs_data["co2_value"]
+                device["status"]["smell_value"] = acs_data["smell_value"]
+                device["status"]["dust_unit"] = acs_data["dust_unit"]
 
                 if device["status"]["dust_unit"] != "PM2.5":
                     self.acs_change_unit(
