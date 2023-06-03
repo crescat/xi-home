@@ -12,13 +12,29 @@ def header(token: str) -> dict[str, str]:
 
 
 def request_data(path, token, params):
+    """
+    Sends a POST request to the API with the given path, token, and parameters.
+
+    Args:
+        path (str): The path to send the request to.
+        token (str): The authorization token to include in the request header.
+        params (dict): The parameters to include in the request body.
+
+    Returns:
+        dict: The JSON response from the API.
+    """
     data = json.dumps(params)
     url = API_PREFIX + path
-    # RetryAdapter 3 times
     s = requests.Session()
     retries = Retry(
-        total=RETRY, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504]
+        total=RETRY,
+        # 0s, 5s, 10s, 20s...
+        backoff_factor=2.5,
+        status_forcelist=[500, 502, 503, 504],
+        # allow retry on POST requests
+        allowed_methods=None,
     )
+
     s.mount(API_PREFIX, HTTPAdapter(max_retries=retries))
     response = s.post(url, data=data, headers=header(token), timeout=TIMEOUT)
     return response.json()
