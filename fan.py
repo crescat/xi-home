@@ -35,13 +35,6 @@ COMMAND_VALUES = {
 }
 
 
-def header(token: str) -> dict[str, str]:
-    return {
-        "authorization": "Bearer {}".format(token),
-        "content-type": "application/json",
-    }
-
-
 async def async_setup_entry(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
@@ -184,6 +177,7 @@ class XiHomeVentilationSystem(CoordinatorEntity, FanEntity):
         self.schedule_update_ha_state()
 
     def update_coordinator_data(self):
+        """Update data from coordinator."""
         self.coordinator.data["indexed_devices"][self.idx]["status"][
             "erv_runstate"
         ] = self._state
@@ -306,7 +300,7 @@ class XiHomeFreshAirUnit(CoordinatorEntity, FanEntity):
         )
 
     def set_state_from_status_data(self, status):
-        """Get status from data."""
+        """Set status from data."""
         self._state = status["fau_runstate"]
         self._current_speed = int(status["fau_airvolume"])
         self._mode = status["fau_mode"]
@@ -361,6 +355,7 @@ class XiHomeFreshAirUnit(CoordinatorEntity, FanEntity):
         self.schedule_update_ha_state()
 
     def update_coordinator_data(self):
+        """Update coordinator data"""
         self.coordinator.data["indexed_devices"][self.idx]["status"][
             "fau_runstate"
         ] = self._state

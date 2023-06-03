@@ -50,12 +50,12 @@ class XiHomeAllLightSwtich(CoordinatorEntity, SwitchEntity):
 
     @property
     def name(self) -> str:
-        """Return the display name of this light."""
+        """Return the display name of this switch."""
         return self._name
 
     @property
     def is_on(self) -> bool | None:
-        """Return true if light is on."""
+        """Return true if switch is on."""
         return self._state
 
     @property

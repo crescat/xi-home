@@ -5,6 +5,16 @@ from .const import TIMEOUT, RETRY, API_PREFIX
 
 
 def header(token: str) -> dict[str, str]:
+    """
+    Returns a dictionary containing the authorization and content-type headers
+    for a request to the API.
+
+    Args:
+        token (str): The authorization token to include in the request header.
+
+    Returns:
+        dict[str, str]: A dictionary containing the authorization and content-type headers.
+    """
     return {
         "authorization": "Bearer {}".format(token),
         "content-type": "application/json",

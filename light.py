@@ -22,13 +22,6 @@ from .helper import request_data
 _LOGGER = logging.getLogger(__name__)
 
 
-def header(token: str) -> dict[str, str]:
-    return {
-        "authorization": "Bearer {}".format(token),
-        "content-type": "application/json",
-    }
-
-
 async def async_setup_entry(
     hass: HomeAssistant,
     config_entry: ConfigEntry,

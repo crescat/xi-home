@@ -48,7 +48,7 @@ class XiHomeElevatorButton(ButtonEntity):
 
     @property
     def name(self) -> str:
-        """Return the display name of this light."""
+        """Return the display name of this button."""
         return self._name
 
     @property
@@ -69,7 +69,7 @@ class XiHomeElevatorButton(ButtonEntity):
             "type": "elevator",
             "userid": self.coordinator.user_id,
         }
-        _response = request_data("/public", self.coordinator.token, body)
+        request_data("/public", self.coordinator.token, body)
 
 
 class XiHomeDoorButton(ButtonEntity):
@@ -88,7 +88,7 @@ class XiHomeDoorButton(ButtonEntity):
 
     @property
     def name(self) -> str:
-        """Return the display name of this light."""
+        """Return the display name of this button."""
         return self._name
 
     @property
@@ -109,4 +109,4 @@ class XiHomeDoorButton(ButtonEntity):
             "door": "{}&{}".format(self._lobbydong, self._lobbyho),
             "userid": self.coordinator.user_id,
         }
-        _response = request_data("/public/openlobby", self.coordinator.token, body)
+        request_data("/public/openlobby", self.coordinator.token, body)

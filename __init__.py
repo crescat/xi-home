@@ -122,6 +122,7 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
         return data
 
     def acs_change_unit(self, device_id, group_id, unit):
+        """Chance unit of acs device."""
         body = {
             "device_id": device_id,
             "type": "acs",
@@ -140,6 +141,7 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
         _response = request_data("/device/command", self.token, body)
 
     def get_acs_data(self, device_id, group_id):
+        """Get acs data from xi_home."""
         body = {
             "device_id": device_id,
             "type": "acs",
@@ -150,6 +152,7 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
         return response["status"]
 
     def get_lobby_door_data(self):
+        """Get lobby door data from xi_home."""
         body = {"type": "doorlock", "userid": self.user_id}
         response = request_data("/public", self.token, body)
         return response["data"]["list"]

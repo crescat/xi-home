@@ -96,7 +96,7 @@ class XiHomeHeatingSystem(CoordinatorEntity, ClimateEntity):
 
     @property
     def name(self) -> str:
-        """Return the display name of this light."""
+        """Return the display name of this heater."""
         return self._name
 
     @property
