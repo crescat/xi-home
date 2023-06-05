@@ -38,8 +38,8 @@ def request_data(path, token, params):
     s = requests.Session()
     retries = Retry(
         total=RETRY,
-        # 0s, 5s, 10s, 20s...
-        backoff_factor=2.5,
+        # 0s, 10s, 20s, 40s, 80s...
+        backoff_factor=5,
         status_forcelist=[500, 502, 503, 504],
         # allow retry on POST requests
         allowed_methods=None,
@@ -47,4 +47,5 @@ def request_data(path, token, params):
 
     s.mount(API_PREFIX, HTTPAdapter(max_retries=retries))
     response = s.post(url, data=data, headers=header(token), timeout=TIMEOUT)
+
     return response.json()
