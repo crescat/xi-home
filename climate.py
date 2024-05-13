@@ -90,7 +90,11 @@ class XiHomeHeatingSystem(CoordinatorEntity, ClimateEntity):
         self._current_hvac_mode = (
             HVACMode.HEAT if device_data["status"]["power"] else HVACMode.OFF
         )
-        self._supported_features = ClimateEntityFeature.TARGET_TEMPERATURE
+        self._supported_features = (
+            ClimateEntityFeature.TURN_OFF | ClimateEntityFeature.TURN_ON |
+            ClimateEntityFeature.TARGET_TEMPERATURE
+        )
+        self._enable_turn_on_off_backwards_compatibility = False
         self._min_temp = 5
         self._max_temp = 40
 
