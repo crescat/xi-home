@@ -51,7 +51,10 @@ class XiHomePM25Sensor(CoordinatorEntity, SensorEntity):
         self._attr_device_class = SensorDeviceClass.PM25
         self._attr_native_unit_of_measurement = "µg/m³"
         self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_value = int(device_data["status"]["dust_value"])
+
+        status = device_data["status"]
+        if status:
+            self._attr_native_value = int(status["dust_value"])
 
     @property
     def name(self) -> str:
@@ -73,9 +76,11 @@ class XiHomePM25Sensor(CoordinatorEntity, SensorEntity):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        self._attr_native_value = int(
-            self.coordinator.data["indexed_devices"][self.idx]["status"]["dust_value"]
-        )
+        status = self.coordinator.data["indexed_devices"][self.idx]["status"]
+        if not status:
+            return
+
+        self._attr_native_value = int(status["dust_value"])
         self.async_write_ha_state()
 
 
@@ -94,7 +99,10 @@ class XiHomeCO2Sensor(CoordinatorEntity, SensorEntity):
         self._attr_device_class = SensorDeviceClass.CO2
         self._attr_native_unit_of_measurement = "ppm"
         self._attr_state_class = SensorStateClass.MEASUREMENT
-        self._attr_native_value = int(device_data["status"]["co2_value"])
+
+        status = device_data["status"]
+        if status:
+            self._attr_native_value = int(status["co2_value"])
 
     @property
     def name(self) -> str:
@@ -116,7 +124,9 @@ class XiHomeCO2Sensor(CoordinatorEntity, SensorEntity):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        self._attr_native_value = int(
-            self.coordinator.data["indexed_devices"][self.idx]["status"]["co2_value"]
-        )
+        status = self.coordinator.data["indexed_devices"][self.idx]["status"]
+        if not status:
+            return
+
+        self._attr_native_value = int(status["co2_value"])
         self.async_write_ha_state()
