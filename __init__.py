@@ -92,7 +92,7 @@ class MyCoordinator(update_coordinator.DataUpdateCoordinator):
         data = request_data("/device/list-redis", self.token, body)
         indexed = dict()
         for device in data["devices"]:
-            if device["type"] == "acs" and device["status"] != {}:
+            if device["type"] == "acs" and device["status"]:
                 # acs data from list-redis api is not correct
                 acs_data = self.get_acs_data(device["device_id"], device["groupID"])
                 device["status"]["dust_value"] = acs_data["dust_value"]

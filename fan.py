@@ -128,6 +128,8 @@ class XiHomeVentilationSystem(CoordinatorEntity, FanEntity):
 
     def set_state_from_status_data(self, status):
         """Get status from data."""
+        if not status:
+            return
         self._state = status["erv_runstate"]
         self._current_speed = int(status["erv_airvolume"])
         self._mode = status["erv_mode"]
